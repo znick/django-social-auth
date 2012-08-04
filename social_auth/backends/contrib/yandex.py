@@ -96,7 +96,8 @@ class YaruAuth(BaseOAuth2):
     SERVER_URL = YANDEX_SERVER
     SETTINGS_KEY_NAME = 'YANDEX_APP_ID'
     SETTINGS_SECRET_NAME = 'YANDEX_API_SECRET'
-
+    REDIRECT_STATE = False
+    
     def get_api_url(self):
         return 'https://api-yaru.yandex.ru/me/'
 
