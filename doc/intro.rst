@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Django Social Auth is an easy to setup social authentication/authorization
+Django Social Auth is an easy way to setup social authentication/authorization
 mechanism for Django projects.
 
 Crafted using base code from django-twitter-oauth_ and django-openid-auth_,
@@ -28,6 +28,7 @@ credentials, some features are:
 
   Some contributions added support for:
 
+    * `DISQUS OAuth`_
     * `LiveJournal OpenID`_
     * `Orkut OAuth`_
     * `Linkedin OAuth`_
@@ -41,7 +42,7 @@ credentials, some features are:
     * `Yahoo OAuth`_
     * `Evernote OAuth`_
     * `Mail.ru OAuth`_
-    * `Odnoklassniki OAuth`_
+    * `Odnoklassniki OAuth`_ and `Odnoklassniki IFrame applications`_
     * `Mixcloud OAuth2`_
     * `BitBucket OAuth`_
     * `Douban OAuth`_
@@ -54,7 +55,7 @@ credentials, some features are:
 - Basic user data population and signaling, to allows custom fields values
   from providers response
 
-- Multiple social accounts association to single users
+- Multiple social account associations to a single user
 
 - Custom User model override if needed (`auth.User`_ by default)
 
@@ -72,6 +73,7 @@ credentials, some features are:
 .. _myOpenID: https://www.myopenid.com/
 .. _Twitter OAuth: http://dev.twitter.com/pages/oauth_faq
 .. _Facebook OAuth: http://developers.facebook.com/docs/authentication/
+.. _DISQUS OAuth: http://disqus.com/api/docs/auth/
 .. _LiveJournal OpenID: http://www.livejournal.com/support/faqbrowse.bml?faqid=283
 .. _Orkut OAuth:  http://code.google.com/apis/orkut/docs/rest/developers_guide_protocol.html#Authenticating
 .. _Linkedin OAuth: https://www.linkedin.com/secure/developer
@@ -85,7 +87,8 @@ credentials, some features are:
 .. _Yahoo OAuth: http://developer.yahoo.com/oauth/guide/oauth-auth-flow.html
 .. _Evernote OAuth: http://dev.evernote.com/documentation/cloud/chapters/Authentication.php
 .. _Mail.ru OAuth: http://api.mail.ru/docs/guides/oauth/
-.. _Odnoklassniki OAuth: http://dev.odnoklassniki.ru/wiki/display/ok/The+OAuth+2.0+Protocol
+.. _Odnoklassniki OAuth: http://dev.odnoklassniki.ru/wiki/pages/viewpage.action?pageId=12878032
+.. _Odnoklassniki IFrame applications: http://dev.odnoklassniki.ru/wiki/display/ok/Odnoklassniki.ru+Third+Party+Platform
 .. _Mixcloud OAuth2: http://www.mixcloud.com/developers/documentation/#authorization
 .. _BitBucket OAuth: https://confluence.atlassian.com/display/BITBUCKET/OAuth+Consumers
 .. _Douban OAuth: http://www.douban.com/service/apidoc/auth

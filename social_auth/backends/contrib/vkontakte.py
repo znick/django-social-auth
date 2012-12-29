@@ -16,6 +16,7 @@ from time import time
 
 from social_auth.backends import SocialAuthBackend, OAuthBackend, BaseAuth, \
                                  BaseOAuth2, USERNAME
+from social_auth.exceptions import AuthTokenRevoked, AuthException
 from social_auth.utils import setting, log, dsa_urlopen
 
 
@@ -49,8 +50,10 @@ class VKontakteBackend(SocialAuthBackend):
             USERNAME: response['id'] if len(nickname) == 0 else nickname,
             'email': '',
             'fullname': '',
-            'first_name': response.get('first_name')[0] if 'first_name' in response else '',
-            'last_name': response.get('last_name')[0] if 'last_name' in response else ''
+            'first_name': response.get('first_name')[0]
+                                if 'first_name' in response else '',
+            'last_name': response.get('last_name')[0]
+                                if 'last_name' in response else ''
         }
 
 
@@ -137,7 +140,6 @@ class VKontakteOAuth2(BaseOAuth2):
     """Vkontakte OAuth mechanism"""
     AUTHORIZATION_URL = VK_AUTHORIZATION_URL
     ACCESS_TOKEN_URL = VK_ACCESS_TOKEN_URL
-    SERVER_URL = VK_SERVER
     AUTH_BACKEND = VKontakteOAuth2Backend
     SETTINGS_KEY_NAME = 'VK_APP_ID'
     SETTINGS_SECRET_NAME = 'VK_API_SECRET'
@@ -158,6 +160,14 @@ class VKontakteOAuth2(BaseOAuth2):
 
         data = vkontakte_api('users.get', params)
 
+        if data.get('error'):
+            error = data['error']
+            msg = error.get('error_msg', 'Unknown error')
+            if error.get('error_code') == 5:
+                raise AuthTokenRevoked(self, msg)
+            else:
+                raise AuthException(self, msg)
+
         if data:
             data = data.get('response')[0]
             data['user_photo'] = data.get('photo')  # Backward compatibility
@@ -170,7 +180,7 @@ class VKontakteAppAuth(VKontakteOAuth2):
 
     def auth_complete(self, *args, **kwargs):
         if USE_APP_AUTH:
-            stop, app_auth = self.application_auth()
+            stop, app_auth = self.application_auth(*args, **kwargs)
 
             if app_auth:
                 return app_auth
@@ -200,7 +210,7 @@ class VKontakteAppAuth(VKontakteOAuth2):
 
         return vkontakte_api('isAppUser', data).get('response', 0)
 
-    def application_auth(self):
+    def application_auth(self, *args, **kwargs):
         required_params = ('is_app_user', 'viewer_id', 'access_token',
                            'api_id')
 
@@ -217,7 +227,7 @@ class VKontakteAppAuth(VKontakteOAuth2):
                                   USE_APP_AUTH['key']])).hexdigest()
 
             if check_key != auth_key:
-                raise ValueError('VKontakte authentication failed: invalid ' \
+                raise ValueError('VKontakte authentication failed: invalid '
                                  'auth key')
 
         user_check = USE_APP_AUTH.get('user_mode', 0)
@@ -232,7 +242,8 @@ class VKontakteAppAuth(VKontakteOAuth2):
 
         data = {'response': self.user_profile(user_id), 'user_id': user_id}
 
-        return (True, authenticate(**{
+        return (True, authenticate(*args, **{'auth': self,
+            'request': self.request,
             'response': data, self.AUTH_BACKEND.name: True
         }))
 
@@ -284,5 +295,5 @@ def vkontakte_api(method, data):
 # Backend definition
 BACKENDS = {
     'vkontakte': VKontakteAuth,
-    'vkontakte-oauth2': VKontakteOAuth2
+    'vkontakte-oauth2': VKontakteAppAuth if USE_APP_AUTH else VKontakteOAuth2
 }

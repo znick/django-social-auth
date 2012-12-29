@@ -3,8 +3,9 @@ import random
 import hashlib
 import urlparse
 import urllib
-from urllib2 import urlopen
 import logging
+from urllib2 import urlopen
+from cgi import parse_qsl
 
 from collections import defaultdict
 from datetime import timedelta, tzinfo
@@ -168,10 +169,14 @@ def backend_setting(backend, name, default=None):
         2. Search for setting given by name
         3. Return default
     """
-    backend_name = backend.AUTH_BACKEND.name.upper().replace('-', '_')
-    return setting('%s_%s' % (backend_name, name)) or \
-           setting(name) or \
-           default
+    backend_name = get_backend_name(backend)
+    setting_name = '%s_%s' % (backend_name.upper().replace('-', '_'), name)
+    if hasattr(settings, setting_name):
+        return setting(setting_name)
+    elif hasattr(settings, name):
+        return setting(name)
+    else:
+        return default
 
 
 logger = None
@@ -216,19 +221,11 @@ def clean_partial_pipeline(request):
         request.session.pop(name, None)
 
 
-def log_exceptions_to_messages(request, backend, err):
-    """Log exception messages to messages app if it's installed."""
-    if 'django.contrib.messages' in setting('INSTALLED_APPS'):
-        from django.contrib.messages.api import error
-        name = backend.AUTH_BACKEND.name
-        error(request, unicode(err), extra_tags='social-auth %s' % name)
-
-
 def url_add_parameters(url, params):
     """Adds parameters to URL, parameter will be repeated if already present"""
     if params:
         fragments = list(urlparse.urlparse(url))
-        fragments[4] = urllib.urlencode(urlparse.parse_qsl(fragments[4]) +
+        fragments[4] = urllib.urlencode(parse_qsl(fragments[4]) +
                                         params.items())
         url = urlparse.urlunparse(fragments)
     return url
@@ -255,6 +252,10 @@ def dsa_urlopen(*args, **kwargs):
     if timeout and 'timeout' not in kwargs:
         kwargs['timeout'] = timeout
     return urlopen(*args, **kwargs)
+
+
+def get_backend_name(backend):
+    return getattr(getattr(backend, 'AUTH_BACKEND', backend), 'name', None)
 
 
 if __name__ == '__main__':

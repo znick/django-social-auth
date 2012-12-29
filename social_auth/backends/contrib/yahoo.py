@@ -7,8 +7,10 @@ YAHOO_CONSUMER_SECRET
 
 References:
 * http://developer.yahoo.com/oauth/guide/oauth-auth-flow.html
-* http://developer.yahoo.com/social/rest_api_guide/introspective-guid-resource.html
-* http://developer.yahoo.com/social/rest_api_guide/extended-profile-resource.html
+* http://developer.yahoo.com/social/rest_api_guide/
+*           introspective-guid-resource.html
+* http://developer.yahoo.com/social/rest_api_guide/
+*           extended-profile-resource.html
 
 Scopes:
 To make this extension works correctly you have to have at least
@@ -22,7 +24,7 @@ from django.utils import simplejson
 
 from social_auth.utils import setting
 from social_auth.backends import ConsumerBasedOAuth, OAuthBackend, USERNAME
-from social_auth.backends.exceptions import AuthUnknownError
+from social_auth.exceptions import AuthUnknownError
 
 
 # Google OAuth base configuration
@@ -64,7 +66,6 @@ class YahooOAuth(ConsumerBasedOAuth):
     AUTHORIZATION_URL = AUTHORIZATION_URL
     REQUEST_TOKEN_URL = REQUEST_TOKEN_URL
     ACCESS_TOKEN_URL = ACCESS_TOKEN_URL
-    SERVER_URL = YAHOO_OAUTH_SERVER
     AUTH_BACKEND = YahooOAuthBackend
     SETTINGS_KEY_NAME = 'YAHOO_CONSUMER_KEY'
     SETTINGS_SECRET_NAME = 'YAHOO_CONSUMER_SECRET'
@@ -79,7 +80,7 @@ class YahooOAuth(ConsumerBasedOAuth):
         try:
             return simplejson.loads(response)['profile']
         except ValueError:
-            raise AuthUnknownError('Error during profile retrieval, ' \
+            raise AuthUnknownError('Error during profile retrieval, '
                                    'please, try again later')
 
     def _get_guid(self, access_token):
@@ -94,7 +95,7 @@ class YahooOAuth(ConsumerBasedOAuth):
             json = simplejson.loads(response)
             return json['guid']['value']
         except ValueError:
-            raise AuthUnknownError('Error during user id retrieval, ' \
+            raise AuthUnknownError('Error during user id retrieval, '
                                    'please, try again later')
 
 

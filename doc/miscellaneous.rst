@@ -5,8 +5,7 @@ Mailing list
 ------------
 
 Join to `django-social-auth discussion list`_ and bring any questions or suggestions
-that would improve this application. Convore_ discussion group is deprecated since
-the service is going to be shut down on April 1st.
+that would improve this application.
 
 
 South users
@@ -49,10 +48,19 @@ Facebook backend. The bug report `#315`_ explains it a bit more and shows
 a workaround fit avoid it.
 
 
+Server date time
+----------------
+
+Bad date in the server might cause errors in the auth process on some services
+like Twitter (probably all OAuth1.0 since timestamp is passed in the parameters
+to request a token).
+
+This issue is usually solved by installing ``ntp`` in the server (which is
+a good practice to have too), and syncing the time with some ntp pool service.
+
 
 .. _South: http://south.aeracode.org/
 .. _django-social-auth: https://github.com/omab/django-social-auth
-.. _Convore: https://convore.com/
 .. _djangopackages.com: http://djangopackages.com/grids/g/social-auth-backends/
 .. _django-social-auth discussion list: https://groups.google.com/group/django-social-auth
 .. _StackOverflow: http://stackoverflow.com/questions/9835506/urllib-urlopen-works-on-sslv3-urls-with-python-2-6-6-on-1-machine-but-not-wit
