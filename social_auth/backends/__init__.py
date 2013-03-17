@@ -59,10 +59,6 @@ SREG_ATTR = [
 OPENID_ID_FIELD = 'openid_identifier'
 SESSION_NAME = 'openid'
 
-# key for username in user details dict used around, see get_user_details
-# method
-USERNAME = 'username'
-
 PIPELINE = setting('SOCIAL_AUTH_PIPELINE', (
                 'social_auth.backends.pipeline.social.social_auth_user',
                 # Removed by default since it can be a dangerouse behavior that
@@ -160,7 +156,7 @@ class SocialAuthBackend(object):
 
     def get_user_details(self, response):
         """Must return user details in a know internal struct:
-            {USERNAME: <username if any>,
+            {'username': <username if any>,
              'email': <user email if any>,
              'fullname': <user full name if any>,
              'first_name': <user first name if any>,
@@ -225,6 +221,7 @@ class OAuthBackend(SocialAuthBackend):
                 name, alias, discard = entry
             elif len(entry) == 1:
                 name = alias = entry
+                discard = False
             else:  # ???
                 continue
 
@@ -270,7 +267,7 @@ class OpenIDBackend(SocialAuthBackend):
 
     def get_user_details(self, response):
         """Return user details from an OpenID request"""
-        values = {USERNAME: '', 'email': '', 'fullname': '',
+        values = {'username': '', 'email': '', 'fullname': '',
                   'first_name': '', 'last_name': ''}
         # update values using SimpleRegistration or AttributeExchange
         # values
@@ -291,10 +288,13 @@ class OpenIDBackend(SocialAuthBackend):
             except ValueError:
                 last_name = fullname
 
-        values.update({'fullname': fullname, 'first_name': first_name,
-                       'last_name': last_name,
-                       USERNAME: values.get(USERNAME) or
-                                   (first_name.title() + last_name.title())})
+        values.update({
+            'fullname': fullname,
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': values.get('username') or
+                        (first_name.title() + last_name.title())
+        })
         return values
 
     def extra_data(self, user, uid, response, details):
@@ -389,9 +389,11 @@ class BaseAuth(object):
         """
         backend_name = self.AUTH_BACKEND.name.upper().replace('-', '_')
         extra_arguments = setting(backend_name + '_AUTH_EXTRA_ARGUMENTS', {})
-        for key in extra_arguments:
+        for key, value in extra_arguments.iteritems():
             if key in self.data:
                 extra_arguments[key] = self.data[key]
+            elif value:
+                extra_arguments[key] = value
         return extra_arguments
 
     @property
@@ -513,7 +515,7 @@ class OpenIdAuth(BaseAuth):
                 max_age = None
 
         if (max_age is not None or preferred_policies is not None
-            or preferred_level_types is not None):
+           or preferred_level_types is not None):
             pape_request = pape.Request(
                 preferred_auth_policies=preferred_policies,
                 max_auth_age=max_age,
@@ -635,7 +637,7 @@ class ConsumerBasedOAuth(BaseOAuth):
         for unauthed_token in unauthed_tokens:
             token = Token.from_string(unauthed_token)
             if token.key == self.data.get('oauth_token', 'no-token'):
-                unauthed_tokens = list(set(unauthed_tokens) - \
+                unauthed_tokens = list(set(unauthed_tokens) -
                                        set([unauthed_token]))
                 self.request.session[name] = unauthed_tokens
                 self.request.session.modified = True
@@ -654,6 +656,9 @@ class ConsumerBasedOAuth(BaseOAuth):
 
     def do_auth(self, access_token, *args, **kwargs):
         """Finish the auth process once the access_token was retrieved"""
+        if isinstance(access_token, basestring):
+            access_token = Token.from_string(access_token)
+
         data = self.user_data(access_token)
         if data is not None:
             data['access_token'] = access_token.to_string()

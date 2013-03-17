@@ -75,8 +75,14 @@ def disconnect(request, backend, association_id=None):
 
 def auth_process(request, backend):
     """Authenticate using social backend"""
-    # Save any defined next value into session
     data = request.POST if request.method == 'POST' else request.GET
+
+    # Save extra data into session.
+    for field_name in setting('SOCIAL_AUTH_FIELDS_STORED_IN_SESSION', []):
+        if field_name in data:
+            request.session[field_name] = data[field_name]
+
+    # Save any defined next value into session
     if REDIRECT_FIELD_NAME in data:
         # Check and sanitize a user-defined GET/POST next field value
         redirect = data[REDIRECT_FIELD_NAME]
@@ -139,9 +145,8 @@ def complete_process(request, backend, *args, **kwargs):
                         request.session.set_expiry(None)
 
             # store last login backend name in session
-            key = setting('SOCIAL_AUTH_LAST_LOGIN',
-                          'social_auth_last_login_backend')
-            request.session[key] = social_user.provider
+            request.session['social_auth_last_login_backend'] = \
+                    social_user.provider
 
             # Remove possible redirect URL from session, if this is a new
             # account, send him to the new-users-page if defined.

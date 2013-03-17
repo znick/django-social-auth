@@ -1,20 +1,18 @@
 """
 BrowserID support
 """
-import time
-from datetime import datetime
 from urllib import urlencode
 
 from django.contrib.auth import authenticate
 from django.utils import simplejson
 
-from social_auth.backends import SocialAuthBackend, BaseAuth, USERNAME
-from social_auth.utils import log, setting, dsa_urlopen
+from social_auth.backends import SocialAuthBackend, BaseAuth
+from social_auth.utils import log, dsa_urlopen
 from social_auth.exceptions import AuthFailed, AuthMissingParameter
 
 
 # BrowserID verification server
-BROWSER_ID_SERVER = 'https://browserid.org/verify'
+BROWSER_ID_SERVER = 'https://verifier.login.persona.org/verify'
 
 
 class BrowserIDBackend(SocialAuthBackend):
@@ -31,9 +29,9 @@ class BrowserIDBackend(SocialAuthBackend):
         #  'audience': 'localhost:8000',
         #  'expires': 1328983575529,
         #  'email': 'name@server.com',
-        #  'issuer': 'browserid.org'}
+        #  'issuer': 'login.persona.org'}
         email = response['email']
-        return {USERNAME: email.split('@', 1)[0],
+        return {'username': email.split('@', 1)[0],
                 'email': email,
                 'fullname': '',
                 'first_name': '',

@@ -14,10 +14,7 @@ TEMPLATE_DEBUG = DEBUG
 ROOT_PATH = abspath(dirname(__file__))
 PROJECT_NAME = basename(ROOT_PATH)
 
-ADMINS = (
-    ('Matias', 'matiasaguirre@gmail.com'),
-)
-
+ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -84,6 +81,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'south',
     'social_auth',
     'app',
 )
@@ -145,6 +143,8 @@ AUTHENTICATION_BACKENDS = (
     'social_auth.backends.contrib.shopify.ShopifyBackend',
     'social_auth.backends.contrib.stocktwits.StocktwitsBackend',
     'social_auth.backends.contrib.behance.BehanceBackend',
+    'social_auth.backends.contrib.readability.ReadabilityBackend',
+    'social_auth.backends.steam.SteamBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 

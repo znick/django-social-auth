@@ -2,10 +2,10 @@ Introduction
 ============
 
 Django Social Auth is an easy way to setup social authentication/authorization
-mechanism for Django projects.
+mechanisms for Django projects.
 
 Crafted using base code from django-twitter-oauth_ and django-openid-auth_,
-implements a common interface to define new authentication providers from
+it implements a common interface to define new authentication providers from
 third parties.
 
 
@@ -13,7 +13,7 @@ third parties.
 Features
 --------
 This application provides user registration and login using social sites
-credentials, some features are:
+credentials. Some features are:
 
 - Registration and Login using social sites using the following providers
   at the moment:
@@ -51,6 +51,8 @@ credentials, some features are:
     * `Twilio`_
     * `Weibo OAuth2`_
     * `Yandex OpenId`_
+    * `Readability OAuth`_
+    * `Stackoverflow OAuth2`_
 
 - Basic user data population and signaling, to allows custom fields values
   from providers response
@@ -97,3 +99,5 @@ credentials, some features are:
 .. _Twilio: https://www.twilio.com/user/account/connect/apps
 .. _Weibo OAuth2: http://open.weibo.com/wiki/Oauth2
 .. _Yandex OpenId: http://openid.yandex.ru/
+.. _Readability OAuth: http://www.readability.com/developers/api
+.. _Stackoverflow OAuth2: http://api.stackexchange.com/
